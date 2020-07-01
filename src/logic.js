@@ -1,5 +1,3 @@
-const { create } = require("react-test-renderer")
-
 const createBoard = (rows, columns) => {
     return Array(rows).fill(0).map((_, row) => {
         return Array(columns).fill(0).map((_, column) => {
@@ -37,4 +35,4 @@ const createMinedBoard = (rows, columns, minesAmount) => {
     return board
 }
 
-export { createdMinedBoard }
+export { createMinedBoard }
