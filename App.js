@@ -1,8 +1,17 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import params from './src/params'
 import MineField from './src/components/MinedField'
-import { createMinedBoard } from './src/logic'
+import {
+  createMinedBoard,
+  cloneBoard,
+  openField,
+  hasExplosion,
+  wonGame,
+  showMines,
+  invertFlag,
+  flagsUsed
+} from './src/logic'
 
 export default class App extends Component {
 
@@ -21,8 +30,42 @@ export default class App extends Component {
     const cols = params.getColumnsAmount()
     const rows = params.getRowsAmount()
     return {
-      board: createMinedBoard(rows, cols, this.minesAmount())
+      board: createMinedBoard(rows, cols, this.minesAmount()),
+      won: false,
+      lost: false
     }
+  }
+
+  onOpenField = (row, column) => {
+    const board = cloneBoard(this.state.board)
+    openField(board, row, column)
+    const lost = hasExplosion(board)
+    const won = wonGame(board)
+
+    if (lost) {
+      showMines(board)
+      Alert.alert('Perdeeeeeu!', 'Ai que burro! Da zero para ele!')
+    }
+
+    if (won) {
+      showMines(board)
+      Alert.alert('Parabéns!', 'Você venceu!')
+    }
+
+    this.setState({ board, lost, won })
+  }
+
+  onMarkField = (row, column) => {
+    const board = cloneBoard(this.state.board)
+    invertFlag(board, row, column)
+    const won = wonGame(board)
+
+    if (won) {
+      showMines(board)
+      Alert.alert('Parabéns!', 'Você venceu!')
+    }
+
+    this.setState({ board, won })
   }
 
   render() {
@@ -32,7 +75,9 @@ export default class App extends Component {
         <Text style={styles.instructions}>
           Tamanho da grade: {params.getRowsAmount()}x{params.getColumnsAmount()}</Text>
         <View style={styles.board}>
-          <MineField board={this.state.board}/>
+          <MineField board={this.state.board}
+            onOpenField={this.onOpenField}
+            onMarkField={this.onMarkField} />
         </View>
       </View>
     )
